@@ -1,14 +1,18 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-export default function TaskCard({ task }) {
+export default function TaskCard({ task, canDrag }) {
   const {
     attributes,
     listeners,
     setNodeRef,
     transform,
     transition,
-  } = useSortable({ id: task.id });
+  } = useSortable({
+    id: task.id,
+    // disabled: !canDrag,
+    disabled: false, // 🔥 force enable
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -21,7 +25,9 @@ export default function TaskCard({ task }) {
       style={style}
       {...attributes}
       {...listeners}
-      className="bg-white p-3 rounded shadow mb-3 cursor-grab"
+      className={`bg-white p-3 rounded shadow mb-3 ${
+        canDrag ? "cursor-grab" : "cursor-not-allowed opacity-60"
+      }`}
     >
       <h3 className="font-semibold">{task.title}</h3>
       <p className="text-sm text-gray-500">
@@ -34,4 +40,3 @@ export default function TaskCard({ task }) {
     </div>
   );
 }
-
