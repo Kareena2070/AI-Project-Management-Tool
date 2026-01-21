@@ -8,43 +8,15 @@ import {
 import Column from "./Column";
 import CreateTaskModal from "./CreateTaskModal";
 import { useAuth } from "../../context/AuthContext";
+import { useTasks } from "../../context/TaskContext";
 
 const columns = ["todo", "inprogress", "review", "done"];
 
 export default function KanbanBoard() {
   const { user } = useAuth();
+  const { tasks, addTask, updateTaskStatus } = useTasks();
 
-  const [tasks, setTasks] = useState([
-    {
-      id: "1",
-      title: "Design Dashboard UI",
-      description: "Create cards and charts",
-      status: "todo",
-      assignee: "Kareena",
-      priority: "high",
-      dueDate: "2026-01-25",
-    },
-    {
-      id: "2",
-      title: "Build Login Page",
-      description: "Auth UI",
-      status: "inprogress",
-      assignee: "Alex",
-      priority: "medium",
-      dueDate: "2026-01-23",
-    },
-    {
-      id: "3",
-      title: "DSA",
-      description: "Auth UI",
-      status: "done",
-      assignee: "Alex",
-      priority: "medium",
-      dueDate: "2026-01-23",
-    },
-  ]);
-
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false); // ✅ MISSING EARLIER
 
   const canDrag = user?.role === "admin" || user?.role === "member";
   const canCreate = user?.role === "admin";
@@ -55,13 +27,8 @@ export default function KanbanBoard() {
     const { active, over } = event;
     if (!over) return;
 
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === active.id
-          ? { ...task, status: over.id }
-          : task
-      )
-    );
+    // 🔥 this must match column id
+    updateTaskStatus(active.id, over.id);
   };
 
   return (
@@ -88,7 +55,7 @@ export default function KanbanBoard() {
             return (
               <SortableContext
                 key={col}
-                items={columnTasks.map((t) => t.id)}   // 🔥 IMPORTANT
+                items={columnTasks.map((t) => t.id)}
                 strategy={verticalListSortingStrategy}
               >
                 <Column
@@ -103,12 +70,10 @@ export default function KanbanBoard() {
         </div>
       </DndContext>
 
-      {showModal && (
+      {canCreate && showModal && (
         <CreateTaskModal
           onClose={() => setShowModal(false)}
-          onCreate={(task) =>
-            setTasks((prev) => [...prev, task])
-          }
+          onCreate={addTask}
         />
       )}
     </>
