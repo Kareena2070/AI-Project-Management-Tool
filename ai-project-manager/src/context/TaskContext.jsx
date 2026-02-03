@@ -209,13 +209,34 @@ export function TaskProvider({ children }) {
     );
   };
 
+  // 🔹 DELETE TASK
+  const deleteTask = async (taskId) => {
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/tasks/${taskId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // remove locally so UI updates immediately
+      setTasks((prev) => prev.filter((t) => t._id !== taskId));
+      return true;
+    } catch (error) {
+      console.error("Delete task failed", error?.response?.data || error.message);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     fetchTasks();
   }, [projectId]);
 
   return (
     <TaskContext.Provider
-      value={{ tasks, addTask, updateTaskStatus }}
+      value={{ tasks, addTask, updateTaskStatus, deleteTask }}
     >
       {children}
     </TaskContext.Provider>

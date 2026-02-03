@@ -18,7 +18,7 @@ export default function Dashboard() {
   ).length;
 
   const pending = tasks.filter(
-    (t) => t.status === "todo" || t.status === "inprogress"
+    (t) => t.status === "todo" || t.status === "in-progress"
   ).length;
 
   const blocked = tasks.filter(

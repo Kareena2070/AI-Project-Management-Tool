@@ -1,10 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useProject } from "../../context/ProjectContext";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Navbar() {
   const { projects, selectedProject, selectProject, createProject } = useProject();
   const [creating, setCreating] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleCreateProject = async () => {
     const name = window.prompt("New project name:");
@@ -20,6 +23,12 @@ export default function Navbar() {
     } finally {
       setCreating(false);
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    // redirect to dashboard or login page
+    navigate("/");
   };
 
   return (
@@ -55,7 +64,35 @@ export default function Navbar() {
         </div>
       </div>
 
-      <div />
+      <div className="flex items-center gap-4">
+        {!user ? (
+          <div className="flex items-center gap-2">
+            <Link to="/login" className="text-sm text-gray-700 hover:underline">
+              Login
+            </Link>
+            <Link to="/register" className="text-sm text-gray-700 hover:underline">
+              Signup
+            </Link>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            {/* Prefer explicit name, fall back to email local-part, then full email */}
+            <span className="text-sm text-gray-700" title={user.email}>
+              {user.name
+                ? user.name
+                : user.email
+                ? user.email.split("@")[0].replace(/^[a-zA-Z]/, (c) => c.toUpperCase())
+                : "User"}
+            </span>
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 text-white px-3 py-1 rounded text-sm"
+            >
+              Logout
+            </button>
+          </div>
+        )}
+      </div>
     </nav>
   );
 }
