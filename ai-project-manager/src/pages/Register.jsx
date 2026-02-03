@@ -1,21 +1,31 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("member");
+  const [error, setError] = useState(null);
+
+  const { register } = useAuth();
 
   const handleRegister = (e) => {
     e.preventDefault();
-
-    const userData = { name, email, role };
-
-    localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("token", "dummy-token");
-
-    window.location.href = "/dashboard";
+    setError(null);
+    // backend register expects email, password, role
+    register(email, password, role)
+      .then(() => {
+        // If auto-login stored a token, go to dashboard; otherwise go to login
+        const token = localStorage.getItem("token");
+        if (token) {
+          window.location.href = "/dashboard";
+        } else {
+          window.location.href = "/";
+        }
+      })
+      .catch((err) => setError(err.message || "Registration failed"));
   };
 
   return (
@@ -68,6 +78,10 @@ export default function Register() {
         <button className="w-full bg-black text-white py-2 rounded hover:bg-gray-800">
           Register
         </button>
+
+        {error && (
+          <p className="text-sm text-red-600 mt-2 text-center">{error}</p>
+        )}
 
         <p className="text-sm text-center mt-4">
           Already have an account?{" "}

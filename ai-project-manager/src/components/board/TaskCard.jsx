@@ -9,9 +9,8 @@ export default function TaskCard({ task, canDrag }) {
     transform,
     transition,
   } = useSortable({
-    id: task.id,
-    // disabled: !canDrag,
-    disabled: false, // 🔥 force enable
+    id: task._id,
+    disabled: !canDrag,
   });
 
   const style = {

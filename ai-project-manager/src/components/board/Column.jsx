@@ -13,7 +13,7 @@ export default function Column({ id, title, tasks, canDrag }) {
 
       {tasks.map((task) => (
         <TaskCard
-          key={task.id}
+          key={task._id}
           task={task}
           canDrag={canDrag}
         />

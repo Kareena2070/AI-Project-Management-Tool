@@ -1,23 +1,25 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+
+  const { login } = useAuth();
 
   const handleLogin = (e) => {
     e.preventDefault();
 
-    // TEMP: mock authentication
-    const userData = {
-      email,
-      role: "member", // later this will come from backend
-    };
-
-    localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("token", "dummy-token");
-
-    window.location.href = "/dashboard";
+    setError(null);
+    login(email, password)
+      .then(() => {
+        window.location.href = "/dashboard";
+      })
+      .catch((err) => {
+        setError(err.message || "Login failed");
+      });
   };
 
   return (
@@ -49,6 +51,10 @@ export default function Login() {
         <button className="w-full bg-black text-white py-2 rounded hover:bg-gray-800">
           Login
         </button>
+
+        {error && (
+          <p className="text-sm text-red-600 mt-2 text-center">{error}</p>
+        )}
 
         <p className="text-sm text-center mt-4">
           Don't have an account?{" "}
